@@ -31,19 +31,20 @@ This is the **backend** of the School Management System built using **Node.js**,
 ---
 
 ## 📁 Project Structure
+<pre>
+
 school-management-BE/
-│
-├── prisma/               # Prisma schema and migration history
+├── prisma/                  # Prisma schema and migration history
 │   └── schema.prisma
-│
-├── controllers/          # All route controllers
-├── routes/               # Express route definitions
-├── middlewares/          # Middlewares (e.g., auth)
-├── utils/                # Utility/helper functions
-├── .env                  # Environment variables
-├── server.js             # Entry point
+├── controllers/             # All route controllers
+├── routes/                  # Express route definitions
+├── middlewares/             # Middlewares (e.g., auth)
+├── utils/                   # Utility/helper functions
+├── .env                     # Environment variables
+├── server.js                # Entry point
 └── README.md
 
+</pre>
 ---
 
 ## ⚙️ Getting Started
