@@ -41,7 +41,6 @@ school-management-BE/
 ├── middlewares/             # Middlewares (e.g., auth)
 ├── utils/                   # Utility/helper functions
 ├── .env                     # Environment variables
-├── server.js                # Entry point
 └── README.md
 
 </pre>
