@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // output   = "../generated/prisma"
 }
 
 datasource db {
@@ -234,6 +233,9 @@ model users {
   phone                                                  String?             @db.VarChar(20)
   address                                                String?
   photo                                                  String?
+  isVerified                                             Boolean             @default(false)
+  verificationOtp                                        String?
+  verificationOtpExpires                                 DateTime?
   notes                                                  notes[]
   notices                                                notices[]
   students                                               students[]

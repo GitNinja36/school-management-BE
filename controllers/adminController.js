@@ -1,4 +1,5 @@
 import prisma from "../config/db.js";
+import bcrypt from 'bcrypt';
 
 // Add Student {working}
 export const addStudent = async (req, res) => {
@@ -180,5 +181,132 @@ export const insertRoutine = async (req, res) => {
     } catch (err) {
         console.error("Routine insertion error:", err);
         return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const updateUser = async (req, res) => {
+    const { id } = req.params;
+    const {
+        name,
+        email,
+        password,
+        phone,
+        address,
+        photo,
+        role,
+        specialised_subject,
+        assigned_class,
+        assigned_section,
+        admission_number,
+        section,
+        parent_name,
+        parent_phone
+    } = req.body;
+
+    try {
+        // Update main user table
+        const updatedUser = await prisma.user.update({
+            where: { id: parseInt(id) },
+            data: {
+                name,
+                email,
+                password,
+                phone,
+                address,
+                photo
+            }
+        });
+
+        // Update teacher if role is teacher
+        if (role === "teacher") {
+            await prisma.teacher.updateMany({
+                where: { user_id: updatedUser.id },
+                data: {
+                    specialised_subject,
+                    assigned_class,
+                    assigned_section
+                }
+            });
+        }
+
+        // Update student if role is student
+        if (role === "student") {
+            await prisma.student.updateMany({
+                where: { user_id: updatedUser.id },
+                data: {
+                    admission_number,
+                    section,
+                    parent_name,
+                    parent_phone
+                }
+            });
+        }
+
+        res.status(200).json({ message: "User updated successfully" });
+
+    } catch (error) {
+        console.error("Update error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+export const deleteUser = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const user = await prisma.user.findUnique({ where: { id: parseInt(id) } });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Delete from teachers or students table first
+        if (user.role === "teacher") {
+            await prisma.teacher.deleteMany({ where: { user_id: user.id } });
+        }
+
+        if (user.role === "student") {
+            await prisma.student.deleteMany({ where: { user_id: user.id } });
+        }
+
+        // Then delete from users table
+        await prisma.user.delete({ where: { id: user.id } });
+
+        res.status(200).json({ message: "User deleted successfully" });
+
+    } catch (error) {
+        console.error("Delete error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+export const updateUserPassword = async (req, res) => {
+    const { email, role, newPassword } = req.body;
+
+    if (!email || !role || !newPassword) {
+        return res.status(400).json({ error: "Email, role, and new password are required" });
+    }
+
+    try {
+        const user = await prisma.users.findFirst({
+            where: { email, role }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: `User with role '${role}' not found.` });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await prisma.users.update({
+            where: { id: user.id },
+            data: { password: hashedPassword }
+        });
+
+        return res.status(200).json({ message: "Password updated successfully" });
+
+    } catch (error) {
+        console.error("Password update error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
     }
 };

@@ -10,11 +10,13 @@ import notesRoute from "../routes/notesRouter.js";
 import classRepresentativeRote from "../routes/classRepresentativeRouter.js"
 import financeRoutes from "../routes/financeRoutes.js"
 import performanceRouters from "../routes/performanceRouter.js"
+import authRoutes from '../routes/authRoutes.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/v1/auth', authRoutes);
 app.use("/v1/principle", principleRouter);
 app.use("/v1/teacher", teacherRouter);
 app.use("/v1/student", studentRouter);
